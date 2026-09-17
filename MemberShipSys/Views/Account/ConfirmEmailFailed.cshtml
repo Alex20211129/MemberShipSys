@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "Email 驗證失敗";
+}
+
+<div class="auth-wrapper">
+    <div class="auth-card text-center">
+        <div class="auth-icon text-danger-icon">⚠️</div>
+        <h1>Email 驗證失敗</h1>
+        <p class="auth-subtitle mb-0">這個驗證連結可能已經過期或無效。</p>
+
+        <div class="auth-links">
+            <a asp-action="ResendConfirmation" class="btn btn-primary w-100">重新發送驗證信</a>
+        </div>
+    </div>
+</div>

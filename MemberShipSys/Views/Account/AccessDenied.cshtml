@@ -1,0 +1,15 @@
+@{
+    ViewData["Title"] = "訪問被拒絕";
+}
+
+<div class="auth-wrapper">
+    <div class="auth-card text-center">
+        <div class="auth-icon text-danger-icon">🚫</div>
+        <h1>存取被拒</h1>
+        <p class="auth-subtitle mb-0">很抱歉，你沒有權限訪問這個頁面。</p>
+
+        <div class="auth-links">
+            <a asp-controller="Home" asp-action="Index" class="btn btn-primary w-100">返回首頁</a>
+        </div>
+    </div>
+</div>

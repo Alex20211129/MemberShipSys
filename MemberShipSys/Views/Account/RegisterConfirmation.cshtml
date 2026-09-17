@@ -1,0 +1,23 @@
+@{
+    ViewData["Title"] = "請驗證您的信箱";
+}
+
+<div class="auth-wrapper">
+    <div class="auth-card text-center">
+        <div class="auth-icon">📬</div>
+        <h1>請驗證您的信箱</h1>
+
+        @if (TempData["EmailSendError"] is string error)
+        {
+            <p class="text-danger-icon">@error</p>
+        }
+        else
+        {
+            <p class="auth-subtitle mb-0">我們已經寄出一封驗證信到你的信箱，請點擊信裡的連結完成驗證。</p>
+        }
+
+        <div class="auth-links">
+            <a asp-action="Login">返回登入</a>
+        </div>
+    </div>
+</div>

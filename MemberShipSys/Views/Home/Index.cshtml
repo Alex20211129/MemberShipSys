@@ -1,0 +1,32 @@
+@{
+    ViewData["Title"] = "首頁";
+}
+
+<div class="hero">
+    <h1>歡迎來到 MemberShipSys</h1>
+    <p>一個練習用的會員系統，實作了可插拔密碼雜湊策略、Google OAuth 登入、Email 驗證與忘記密碼流程，以及完整的 Admin 後台管理。</p>
+    <a asp-controller="Account" asp-action="Register" class="btn btn-light">立即註冊</a>
+</div>
+
+<div class="feature-grid">
+    <div class="feature-card">
+        <div class="feature-icon">🔑</div>
+        <h3>可插拔密碼雜湊</h3>
+        <p>支援 PBKDF2、BCrypt、Argon2 三種演算法，Admin 後台可即時切換，登入時自動遷移舊帳號。</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🌐</div>
+        <h3>Google OAuth 登入</h3>
+        <p>手刻 Authorization Code Flow，帳號依 Email 自動關聯，支援事後補設本地密碼。</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">✉️</div>
+        <h3>Email 驗證與忘記密碼</h3>
+        <p>透過 Resend 寄送真實驗證信與重設密碼信，並提供連結失效時的重新發送機制。</p>
+    </div>
+    <div class="feature-card">
+        <div class="feature-icon">🛡️</div>
+        <h3>Admin 後台</h3>
+        <p>會員管理、帳號停用/解鎖、角色調整、強制登出、演算法切換，一應俱全。</p>
+    </div>
+</div>

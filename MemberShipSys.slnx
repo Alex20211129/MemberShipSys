@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="MemberShipSys.Tests/MemberShipSys.Tests.csproj" />
+  <Project Path="MemberShipSys/MemberShipSys.csproj" />
+</Solution>

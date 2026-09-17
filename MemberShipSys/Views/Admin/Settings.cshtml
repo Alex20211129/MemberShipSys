@@ -1,0 +1,22 @@
+@model MemberShipSys.Models.AppSetting
+@{
+    ViewData["Title"] = "系統設定";
+}
+
+<div class="dashboard-header">
+    <div>
+        <h1>系統設定</h1>
+        <p class="text-muted mb-0">設定全站新註冊帳號使用的密碼雜湊演算法</p>
+    </div>
+    <a asp-action="Index" class="btn btn-outline-secondary">← 返回會員管理</a>
+</div>
+
+<div class="dashboard-card settings-card">
+    <form asp-action="Settings" method="post">
+        <div class="form-group mb-3">
+            <label asp-for="CurrentHashAlgorithm" class="form-label">目前生效的密碼雜湊演算法</label>
+            <select asp-for="CurrentHashAlgorithm" class="form-select" asp-items="Html.GetEnumSelectList<MemberShipSys.Models.PasswordHashAlgorithm>()"></select>
+        </div>
+        <button type="submit" class="btn btn-primary">儲存</button>
+    </form>
+</div>

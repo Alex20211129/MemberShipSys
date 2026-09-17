@@ -1,0 +1,36 @@
+@model MemberShipSys.Models.RegisterViewModel
+@{
+    ViewData["Title"] = "註冊頁面";
+}
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-icon">📝</div>
+        <h1>建立新帳號</h1>
+        <p class="auth-subtitle">加入 MemberShipSys，開始體驗完整的會員系統</p>
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <form asp-action="Register" method="post">
+            <div class="form-group mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="ConfirmPassword" class="form-label"></label>
+                <input asp-for="ConfirmPassword" class="form-control" />
+                <span asp-validation-for="ConfirmPassword" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">註冊</button>
+        </form>
+
+        <div class="auth-links">
+            已經有帳號了嗎？ <a asp-action="Login">前往登入</a>
+        </div>
+    </div>
+</div>

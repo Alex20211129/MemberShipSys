@@ -1,0 +1,95 @@
+@model List<MemberShipSys.Models.MemberListItemViewModel>
+@{
+    ViewData["Title"] = "會員管理";
+}
+
+<div class="dashboard-header">
+    <div>
+        <h1>會員管理</h1>
+        <p class="text-muted mb-0">共 @Model.Count 位會員</p>
+    </div>
+    <a asp-action="Settings" class="btn btn-outline-primary">⚙️ 系統設定</a>
+</div>
+
+<div class="dashboard-card">
+    <div class="table-responsive">
+        <table class="table member-table">
+            <thead>
+                <tr>
+                    <th><span>Email</span></th>
+                    <th><span>加入日期</span></th>
+                    <th><span>角色</span></th>
+                    <th><span>狀態</span></th>
+                    <th><span>鎖定</span></th>
+                    <th><span>最後登入</span></th>
+                    <th><span>登入次數</span></th>
+                    <th><span>雜湊演算法</span></th>
+                    <th><span>操作</span></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var member in Model)
+                {
+                    <tr>
+                        <td><span>@member.Email</span></td>
+                        <td><span>@member.CreatedAt</span></td>
+                        <td>
+                            @foreach (var role in member.Roles)
+                            {
+                                <span class="badge-role">@role</span>
+                            }
+                        </td>
+                        <td>
+                            @if (member.IsDisabled)
+                            {
+                                <span class="badge-status disabled">已停用</span>
+                            }
+                            else
+                            {
+                                <span class="badge-status active">啟用中</span>
+                            }
+                        </td>
+                        <td>
+                            @if (member.IsLockedOut)
+                            {
+                                <span class="badge-status locked">已鎖定</span>
+                            }
+                            else
+                            {
+                                <span class="text-muted">—</span>
+                            }
+                        </td>
+                        <td><span>@(member.LastLoginAt.HasValue ? member.LastLoginAt.Value.ToString("yyyy-MM-dd HH:mm") : "尚未登入")</span></td>
+                        <td><span>@member.LoginCount</span></td>
+                        <td><span>@(member.CurrentHashAlgorithm.HasValue ? member.CurrentHashAlgorithm.Value.ToString() : "（無本地密碼）")</span></td>
+                        <td>
+                            <div class="d-flex flex-wrap action-buttons">
+                                <form asp-action="ToggleDisabled" asp-route-id="@member.Id" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm @(member.IsDisabled ? "btn-success" : "btn-danger")">
+                                        @(member.IsDisabled ? "啟用" : "停用")
+                                    </button>
+                                </form>
+                                @if (member.IsLockedOut)
+                                {
+                                    <form asp-action="Unlock" asp-route-id="@member.Id" method="post" class="d-inline">
+                                        <button type="submit" class="btn btn-sm btn-warning">
+                                            解鎖
+                                        </button>
+                                    </form>
+                                }
+                                <form asp-action="ToggleRole" asp-route-id="@member.Id" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-secondary">
+                                        @(member.Roles.Contains("Admin") ? "設為 Member" : "設為 Admin")
+                                    </button>
+                                </form>
+                                <form asp-action="ForceLogout" asp-route-id="@member.Id" method="post" class="d-inline">
+                                    <button type="submit" class="btn btn-sm btn-outline-dark">強制登出</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

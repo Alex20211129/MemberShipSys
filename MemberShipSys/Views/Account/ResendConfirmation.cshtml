@@ -1,0 +1,26 @@
+@model MemberShipSys.Models.ResendConfirmationViewModel
+@{
+    ViewData["Title"] = "驗證信重新發送";
+}
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-icon">✉️</div>
+        <h1>重新發送驗證信</h1>
+        <p class="auth-subtitle">輸入你的信箱，我們會重新寄送一封驗證信</p>
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <form asp-action="ResendConfirmation" method="post">
+            <div class="form-group mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">重新發送驗證信</button>
+        </form>
+
+        <div class="auth-links">
+            <a asp-action="Login">返回登入</a>
+        </div>
+    </div>
+</div>

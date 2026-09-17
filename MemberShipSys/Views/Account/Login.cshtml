@@ -1,0 +1,41 @@
+@model MemberShipSys.Models.LoginViewModel
+@{
+    ViewData["Title"] = "登入頁面";
+}
+
+<div class="auth-wrapper">
+    <div class="auth-card">
+        <div class="auth-icon">👋</div>
+        <h1>歡迎回來</h1>
+        <p class="auth-subtitle">登入你的 MemberShipSys 帳號</p>
+
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <form asp-action="Login" method="post">
+            <div class="form-group mb-3">
+                <label asp-for="Email" class="form-label"></label>
+                <input asp-for="Email" class="form-control" />
+                <span asp-validation-for="Email" class="text-danger"></span>
+            </div>
+            <div class="form-group mb-3">
+                <label asp-for="Password" class="form-label"></label>
+                <input asp-for="Password" class="form-control" />
+                <span asp-validation-for="Password" class="text-danger"></span>
+            </div>
+            <div class="form-check mb-3">
+                <input asp-for="RememberMe" class="form-check-input" />
+                <label asp-for="RememberMe" class="form-check-label"></label>
+            </div>
+            <button type="submit" class="btn btn-primary w-100">登入</button>
+        </form>
+
+        <div class="auth-divider"><span>或</span></div>
+        <a asp-action="GoogleLogin" class="btn btn-outline-danger w-100">使用 Google 登入</a>
+
+        <div class="auth-links">
+            <a asp-action="ForgotPassword">忘記密碼？</a> ・ <a asp-action="ResendConfirmation">沒收到驗證信？</a>
+        </div>
+        <div class="auth-links">
+            還沒有帳號？ <a asp-action="Register">立即註冊</a>
+        </div>
+    </div>
+</div>
