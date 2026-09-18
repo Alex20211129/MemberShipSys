@@ -1,6 +1,6 @@
 # MemberShipSys
 
-一個練習用的 ASP.NET Core MVC 會員系統，目的是動手刻密碼雜湊、OAuth、Email 驗證這些「底層邏輯」，而不是只呼叫框架內建的現成方法。
+一個練習用的會員系統，目的是動手刻密碼雜湊、OAuth、Email 驗證這些「底層邏輯」，而不是只呼叫框架內建的現成方法。核心會員系統（`MemberShipSys.Core`）是一個 **Razor Class Library**，可以被其他 ASP.NET Core MVC 專案直接參考、取得完整的會員系統 UI + 邏輯；`MemberShipSys` 網站專案是這個 Library 的範例/Demo。
 
 ## 目錄
 
@@ -13,6 +13,7 @@
 - [快速開始](#快速開始)
 - [外部服務設定備忘](#外部服務設定備忘)
 - [專案結構](#專案結構)
+- [在其他專案裡重用這個 Library](#在其他專案裡重用這個-library)
 - [測試](#測試)
 
 ## 功能特色
@@ -148,15 +149,20 @@ flowchart LR
 
 ### 1. 還原套件並建立資料庫
 
+`ApplicationDbContext` 住在 `MemberShipSys.Core`（Class Library，不能直接執行），所以 EF 指令要從 Core 目錄下、並且指定 `MemberShipSys` 網站專案當 `--startup-project`：
+
 ```bash
-cd MemberShipSys
 dotnet restore
-dotnet ef database update
+cd MemberShipSys.Core
+dotnet ef database update --startup-project ../MemberShipSys/MemberShipSys.csproj
 ```
 
 ### 2. 設定 User Secrets（必要，沒設定啟動會失敗或功能無法使用）
 
+user-secrets 是設定在**網站專案**（`MemberShipSys`）上，不是 Library：
+
 ```bash
+cd MemberShipSys
 dotnet user-secrets init
 dotnet user-secrets set "AdminSeed:Email" "admin@example.com"
 dotnet user-secrets set "AdminSeed:Password" "一組符合密碼原則的密碼"
@@ -199,32 +205,61 @@ dotnet run --launch-profile https
 ### 資料庫
 
 - 開發環境用 SQL Server LocalDB（`(localdb)\mssqllocaldb`），連線字串在 `appsettings.json`，不含帳密（Windows 整合驗證）
+- ⚠️ **`ApplicationDbContext` 住在 `MemberShipSys.Core`（Class Library），`dotnet ef` 指令需要「啟動專案」（一個可執行的專案）才能運作**。光是 Core 有 `Microsoft.EntityFrameworkCore.Tools` 還不夠——啟動專案（`MemberShipSys` 網站專案）本身也要有 `Microsoft.EntityFrameworkCore.Design` 套件參考，不然會出現「startup project 沒有 reference Design 套件」的錯誤。這個套件已經加在 `MemberShipSys.csproj` 裡了，之後新建其他要重用這個 Library 的專案時記得也要加。
+
+### 靜態資源（Razor Class Library）
+
+- `MemberShipSys.Core/wwwroot/css/site.css` 這種放在 Class Library 裡的靜態檔案，實際對外的網址**不是**單純的 `~/css/site.css`，而是會自動加上 `_content/{組件名稱}/` 前綴，變成 `~/_content/MemberShipSys.Core/css/site.css`——這是 ASP.NET Core 刻意的設計（避免多個不同 Library 各自的 `site.css` 互相打架），`_Layout.cshtml` 裡的 `<link>` 已經照這個規則寫好了。之後如果在 Library 裡新增其他靜態檔案（圖片、JS），記得路徑也要照這個規則寫。
 - 換到正式環境的 SQL Server 時，連線字串要透過環境變數或 `appsettings.Production.json` 覆蓋，不要直接改 `appsettings.json`
 
 ## 專案結構
 
 ```
-MemberShipSys/
-├── Controllers/
-│   ├── AccountController.cs   # 註冊/登入/登出/OAuth/Email驗證/忘記密碼/設定密碼
-│   ├── AdminController.cs     # 會員管理後台（僅 Admin）
-│   └── HomeController.cs
-├── Data/
-│   └── ApplicationDbContext.cs
-├── Models/                    # ViewModel + MembershipUser + AppSetting + enum
+MemberShipSys.Core/                       # Razor Class Library —— 會員系統本體，可被其他專案參考重用
+├── Controllers/ (AccountController.cs, AdminController.cs)
+├── Data/ApplicationDbContext.cs
+├── Migrations/
+├── Models/                               # MembershipUser、PasswordHashAlgorithm、AppSetting、所有 ViewModel
 ├── Services/
-│   ├── IPasswordHashStrategy.cs / Hashing/*.cs   # 三種雜湊策略 + 組合器
+│   ├── IPasswordHashStrategy.cs / Hashing/*.cs    # 三種雜湊策略 + 組合器
 │   ├── ICurrentAlgorithmProvider.cs / DbCurrentAlgorithmProvider.cs
 │   └── IEmailSender.cs / ResendEmailSender.cs
+├── Extensions/MembershipServiceCollectionExtensions.cs   # AddMembershipSystem(...) / SeedMembershipSystemAsync(...)
 ├── Views/
-│   ├── Account/                # 卡片式表單（登入/註冊/忘記密碼等）
-│   ├── Admin/                  # 會員管理 Dashboard
-│   └── Shared/_Layout.cshtml   # 導覽列 + 通用 StatusMessage 訊息橫幅
-├── Migrations/
-└── wwwroot/css/site.css        # 自訂設計系統（配色/卡片/徽章/RWD）
+│   ├── Account/                          # 卡片式表單（登入/註冊/忘記密碼等）
+│   ├── Admin/                            # 會員管理 Dashboard
+│   └── Shared/_Layout.cshtml             # 預設導覽列 + 通用 StatusMessage 訊息橫幅（host 可覆蓋）
+└── wwwroot/css/site.css                  # 自訂設計系統（配色/卡片/徽章/RWD）
 
-MemberShipSys.Tests/            # 三種雜湊策略的單元測試
+MemberShipSys/                            # 網站專案 —— MemberShipSys.Core 的範例/Demo
+├── Controllers/HomeController.cs、Models/ErrorViewModel.cs   # 跟會員系統無關，留在這裡
+├── Views/Home/*、Views/Shared/Error.cshtml
+├── Program.cs                            # 只需呼叫 AddMembershipSystem(...) / SeedMembershipSystemAsync(...)
+└── appsettings.json、Properties/launchSettings.json
+
+MemberShipSys.Tests/                      # 三種雜湊策略的單元測試（reference MemberShipSys.Core）
 ```
+
+## 在其他專案裡重用這個 Library
+
+1. 讓新專案（例如聊天室）的 `.csproj` 加一筆 `<ProjectReference Include="...\MemberShipSys.Core\MemberShipSys.Core.csproj" />`（或之後打包成 NuGet 套件再參考）
+2. `Program.cs` 只要兩行就能拿到整套會員系統：
+   ```csharp
+   using MemberShipSys.Extensions;
+
+   builder.Services.AddControllersWithViews();
+   builder.Services.AddMembershipSystem(builder.Configuration);
+   // ...
+   var app = builder.Build();
+   await app.Services.SeedMembershipSystemAsync(builder.Configuration);
+   ```
+3. 新專案自己的 `appsettings.json`/user-secrets 要有 `ConnectionStrings:DefaultConnection`、`AdminSeed:*`、`GoogleOAuth:*`、`Resend:*` 這些設定鍵（見上面「快速開始」）
+4. **想客製外觀**：在新專案自己的 `Views/Shared/` 放一份 `_Layout.cshtml`，Razor 找 View 時會優先用新專案自己的版本，蓋過 Library 提供的預設版本；不客製的話直接沿用 Library 內建的樣式，開箱即用
+5. **新專案自己的資料表**（例如聊天室的 `ChatMessage`）用**另一個獨立的 `DbContext`**，指向同一個資料庫，不要跟 `ApplicationDbContext` 混在一起。因為兩個 DbContext 預設會共用同一張 `__EFMigrationsHistory` 表，記得在新 DbContext 的 `UseSqlServer(...)` 設定裡加上 `sql => sql.MigrationsHistoryTable("__EFMigrationsHistory_你的專案名")`，避免兩邊的 migration 歷史互相打架
+6. **下 migration 指令**要指定 Library 為目標、可執行的網站專案為 startup project：
+   ```bash
+   dotnet ef migrations add 遷移名稱 --project MemberShipSys.Core --startup-project 你的網站專案
+   ```
 
 ## 測試
 

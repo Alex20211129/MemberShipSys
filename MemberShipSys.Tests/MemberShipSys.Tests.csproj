@@ -19,7 +19,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MemberShipSys\MemberShipSys.csproj" />
+    <ProjectReference Include="..\MemberShipSys.Core\MemberShipSys.Core.csproj" />
   </ItemGroup>
 
 </Project>
