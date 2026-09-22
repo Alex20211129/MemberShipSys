@@ -68,6 +68,15 @@ namespace MemberShipSys.Extensions
                 }
             }
 
+            //設定雜湊演算法預設值（要在建立任何使用者之前先種好，
+            //因為建立使用者會觸發密碼雜湊，雜湊器需要先查得到這裡的設定值）
+            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+            if (!await dbContext.AppSettings.AnyAsync())
+            {
+                dbContext.AppSettings.Add(new AppSetting { CurrentHashAlgorithm = PasswordHashAlgorithm.Argon2 });
+                await dbContext.SaveChangesAsync();
+            }
+
             string adminEmail = configuration["AdminSeed:Email"] ?? "admin@example.com";
             string adminPassword = configuration["AdminSeed:Password"] ?? "Admin123!";
             var adminUser = await userManager.FindByEmailAsync(adminEmail);
@@ -89,14 +98,6 @@ namespace MemberShipSys.Extensions
                 {
                     throw new Exception("Seed admin user failed: " + string.Join("; ", result.Errors.Select(e => e.Description)));
                 }
-            }
-
-            //設定雜湊演算法預設值
-            var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
-            if (!await dbContext.AppSettings.AnyAsync())
-            {
-                dbContext.AppSettings.Add(new AppSetting { CurrentHashAlgorithm = PasswordHashAlgorithm.Argon2 });
-                await dbContext.SaveChangesAsync();
             }
         }
     }
